@@ -31,7 +31,19 @@
       };
 
       devShell = pkgs.mkShell {
-        buildInputs = [ pkgs.nixpkgs-fmt ];
+        buildInputs = with pkgs; [
+          go
+          gotools
+          gopls
+          go-outline
+          gocode
+          gopkgs
+          gocode-gomod
+          godef
+          golint
+          delve
+          nixpkgs-fmt
+        ];
       };
     });
 }
