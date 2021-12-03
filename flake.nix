@@ -38,12 +38,25 @@
       };
 
       devShells.default = pkgs.mkShell {
-        buildInputs = [
-          pkgs.cachix
-          pkgs.statix
-          pkgs.vulnix
-          pkgs.deadnix
-          pkgs.nil
+        buildInputs = with pkgs; [
+          # Golang
+          go
+          gotools
+          gopls
+          go-outline
+          gocode
+          gopkgs
+          gocode-gomod
+          godef
+          golint
+          delve
+          
+          # Nix
+          cachix
+          statix
+          vulnix
+          deadnix
+          nil
         ];
       };
     });

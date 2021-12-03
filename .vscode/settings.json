@@ -6,6 +6,6 @@
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
   "files.watcherExclude": {
-    "**/.tmp/*/**": true
+    "**/.direnv/*/**": true
   }
 }
