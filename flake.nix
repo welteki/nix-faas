@@ -11,9 +11,9 @@
   outputs = { nix, self, nixpkgs, utils, ... }@inputs: {
 
     overlay = final: prev: {
-      of-watchdog = import ./packages/of-watchdog.nix final;
-      classic-watchdog = import ./packages/classic-watchdog.nix final;
-      ofTools = import ./packages/build-support/openfaas final;
+      of-watchdog = import ./pkgs/of-watchdog.nix final;
+      classic-watchdog = import ./pkgs/classic-watchdog.nix final;
+      ofTools = import ./pkgs/build-support/openfaas final;
     };
 
   } // utils.lib.eachSystem [ "x86_64-linux" ] (system:
