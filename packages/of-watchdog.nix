@@ -24,4 +24,8 @@ buildGoModule rec {
     "-X main.GitCommit=${rev}"
     "-X main.Version=${version}"
   ];
+
+  postInstall = ''
+    ln -s $out/bin/of-watchdog $out/bin/fwatchdog
+  '';
 }
