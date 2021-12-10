@@ -23,14 +23,19 @@ let
     functions = mapAttrs (k: c: c.stackEntry) config.functions;
     nix-faas = config.of-stack.extended;
   };
-
-  stackYaml = pkgs.writeText "stack.yaml" (builtins.toJSON stack);
+  stackYamlText = builtins.toJSON stack;
+  stackYaml = pkgs.writeText "stack.yaml" stackYamlText;
 in
 {
   options = {
     stackYaml = mkOption {
       type = package;
       description = "A derivation that produces a stack.yaml file for this function stack.";
+      readOnly = true;
+    };
+
+    stackYamlText = mkOption {
+      type = str;
       readOnly = true;
     };
 
@@ -55,6 +60,6 @@ in
   };
 
   config = {
-    inherit stackYaml;
+    inherit stackYaml stackYamlText;
   };
 }
