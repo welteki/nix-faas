@@ -1,4 +1,6 @@
-{ modules, pkgs }:
+{ pkgs ? import <nixpkgs> { }
+, modules ? [ ]
+}:
 
 let
   inherit (pkgs) lib buildGoModule;
