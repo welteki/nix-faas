@@ -11,8 +11,8 @@ let
   };
 
   baseModules = [ pkgsModule ] ++ [
-    ./modules/of-stack.nix
-    ./modules/images.nix
+    ../modules/of-stack.nix
+    ../modules/images.nix
   ];
 
   pkgsModule = rec {
