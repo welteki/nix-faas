@@ -21,7 +21,7 @@ let
   stack = {
     inherit (config) provider;
     functions = mapAttrs (k: c: c.stackEntry) config.functions;
-    nix-faas = config.of-stack.extended;
+    x-nix-faas = config.of-stack.extended;
   };
   stackYamlText = builtins.toJSON stack;
   stackYaml = pkgs.writeText "stack.yaml" stackYamlText;

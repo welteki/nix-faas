@@ -10,8 +10,8 @@ let
       inherit (function) build;
     in
     {
-      imageSpecifier = build.imageSpecifier;
-      imageExe = build.image.outPath;
+      specifier = build.imageSpecifier;
+      source = build.image.outPath;
     };
 in
 {
