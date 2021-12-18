@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"path"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -61,11 +60,10 @@ func build(module string, outLink string, quitBuild bool) error {
 		args = append(args, fmt.Sprintf("--out-link %s", outLink))
 	}
 
-	script := strings.Join(args, " ")
-
 	task := execute.ExecTask{
-		Command:     "bash",
-		Args:        append([]string{"-c"}, fmt.Sprintf("%s %s", cmd, script)),
+		Command:     cmd,
+		Args:        args,
+		Shell:       true,
 		StreamStdio: !quitBuild,
 	}
 
