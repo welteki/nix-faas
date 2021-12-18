@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 
 	"gopkg.in/yaml.v2"
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/spf13/cobra"
+	"github.com/welteki/nix-faas/cli/image"
 	"github.com/welteki/nix-faas/cli/stack"
 )
 
@@ -63,32 +63,15 @@ func runPublish(cmd *cobra.Command, args []string) error {
 	return err
 }
 
-func push(image stack.ImageMetadata) error {
-	tarImageFile, err := ioutil.TempFile("", "nix-faas-docker-tar-*")
-	if err != nil {
-		return fmt.Errorf("Error while creating temporary file %s", err.Error())
-	}
-	defer os.Remove(tarImageFile.Name())
-
-	generateImage := exec.Command(image.Source)
-	generateImage.Stdout = tarImageFile
-
-	startErr := generateImage.Start()
-	if startErr != nil {
-		return startErr
-	}
-
-	execErr := generateImage.Wait()
-	if execErr != nil {
-		return execErr
-	}
+func push(m stack.ImageMetadata) error {
+	a, err := image.NewArchiveFromStream(m.Source)
 
 	cmd := "skopeo"
 
 	args := []string{
 		"copy",
-		fmt.Sprintf("docker-archive:%s", tarImageFile.Name()),
-		fmt.Sprintf("docker://%s", image.Specifier),
+		fmt.Sprintf("docker-archive:%s", a.Path()),
+		fmt.Sprintf("docker://%s", m.Specifier),
 		"--insecure-policy",
 	}
 
