@@ -63,8 +63,16 @@ func runPublish(cmd *cobra.Command, args []string) error {
 	return err
 }
 
-func push(m stack.ImageMetadata) error {
+func push(m stack.ImageMetadata) (retErr error) {
 	a, err := image.NewArchiveFromStream(m.Source)
+	if err != nil {
+		return fmt.Errorf("creating image archive: %w", err)
+	}
+	defer func() {
+		if err := a.Close(); err != nil {
+			retErr = fmt.Errorf("(archive: %v): %w", err, retErr)
+		}
+	}()
 
 	cmd := "skopeo"
 
