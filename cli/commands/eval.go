@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path"
 	"strconv"
-	"strings"
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/spf13/cobra"
@@ -53,14 +52,10 @@ func eval(module string) (string, error) {
 		"--attr config.stackYamlText",
 	}
 
-	// Setting Shell option for execute does not work since it assumes /bin/bash is present on
-	// the system which is not the case for NixOS.
-	// TODO: raise issue upstream
-	script := strings.Join(args, " ")
-
 	task := execute.ExecTask{
-		Command: "bash",
-		Args:    append([]string{"-c"}, fmt.Sprintf("%s %s", cmd, script)),
+		Command: cmd,
+		Args:    args,
+		Shell:   true,
 	}
 
 	res, err := task.Execute()
