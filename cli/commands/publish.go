@@ -94,16 +94,16 @@ func push(m stack.ImageMetadata) error {
 	return nil
 }
 
-func readNixFaasConfig(yamlFile string) (stack.NixFaas, error) {
+func readNixFaasConfig(path string) (stack.NixFaas, error) {
 	config := stack.NixFaas{}
 
-	configBytes, err := ioutil.ReadFile(yamlFile)
+	configBytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return config, fmt.Errorf("Error while reading files %s", err.Error())
+		return config, fmt.Errorf("reading file %q: %w", path, err)
 	}
 	unmarshallErr := yaml.Unmarshal(configBytes, &config)
 	if unmarshallErr != nil {
-		return config, fmt.Errorf("Error while reading configuration: %s", err.Error())
+		return config, fmt.Errorf("reading configuration: %w", err)
 	}
 	return config, nil
 }
