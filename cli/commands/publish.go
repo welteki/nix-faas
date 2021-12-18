@@ -15,6 +15,9 @@ import (
 )
 
 func init() {
+	build, _, _ := rootCmd.Find([]string{"build"})
+	publishCmd.Flags().AddFlagSet(build.Flags())
+
 	rootCmd.AddCommand(publishCmd)
 }
 
@@ -34,15 +37,21 @@ func preRunPublish(cmd *cobra.Command, args []string) error {
 }
 
 func runPublish(cmd *cobra.Command, args []string) error {
-	outLink := path.Join(os.TempDir(), ".tmp-stack.yaml")
-	defer os.Remove(outLink)
+	var out string
+	if len(outLink) == 0 {
+		// TODO: outlink should contain random part
+		out = path.Join(os.TempDir(), ".tmp-stack.yaml")
+		defer os.Remove(outLink)
+	} else {
+		out = outLink
+	}
 
-	err := build(stackModule, outLink, false)
+	err := build(stackModule, out, false)
 	if err != nil {
 		return err
 	}
 
-	config, err := readNixFaasConfig(outLink)
+	config, err := readNixFaasConfig(out)
 
 	for _, image := range config.StackMetadata.Images {
 		err := push(image)
