@@ -2,11 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"path"
 
 	"github.com/spf13/cobra"
-
-	execute "github.com/alexellis/go-execute/pkg/v1"
+	"github.com/welteki/nix-faas/cli/nix"
 )
 
 var (
@@ -35,46 +33,10 @@ func preRunBuild(cmd *cobra.Command, args []string) error {
 }
 
 func runBuild(cmd *cobra.Command, args []string) error {
-	err := build(stackModule, outLink, false)
+	err := nix.BuildStack(stackModule, outLink)
 
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func build(module string, outLink string, quitBuild bool) error {
-	cmd := "nix-build"
-
-	args := []string{
-		path.Join(getNixDir(), "lib/eval-stack.nix"),
-		fmt.Sprintf("--arg modules \"[ \"%s\" ]\"", module),
-		"--show-trace",
-		"--attr config.stackYaml",
-	}
-
-	if len(outLink) == 0 {
-		args = append(args, "--no-out-link")
-	} else {
-		args = append(args, fmt.Sprintf("--out-link %s", outLink))
-	}
-
-	task := execute.ExecTask{
-		Command:     cmd,
-		Args:        args,
-		Shell:       true,
-		StreamStdio: !quitBuild,
-	}
-
-	res, err := task.Execute()
-
-	if err != nil {
-		return err
-	}
-
-	if res.ExitCode != 0 {
-		return fmt.Errorf("received non-zero exit code from build, error: %s", res.Stderr)
 	}
 
 	return nil

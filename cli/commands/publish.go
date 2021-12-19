@@ -11,6 +11,7 @@ import (
 	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/spf13/cobra"
 	"github.com/welteki/nix-faas/cli/image"
+	"github.com/welteki/nix-faas/cli/nix"
 	"github.com/welteki/nix-faas/cli/stack"
 )
 
@@ -46,7 +47,7 @@ func runPublish(cmd *cobra.Command, args []string) error {
 		out = outLink
 	}
 
-	err := build(stackModule, out, false)
+	err := nix.BuildStack(stackModule, out)
 	if err != nil {
 		return err
 	}

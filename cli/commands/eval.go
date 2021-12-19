@@ -2,11 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"path"
 	"strconv"
 
-	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/spf13/cobra"
+	"github.com/welteki/nix-faas/cli/nix"
 )
 
 func init() {
@@ -29,46 +28,14 @@ func preRunEval(cmd *cobra.Command, args []string) error {
 }
 
 func runEval(cmd *cobra.Command, args []string) error {
-	stackYaml, err := eval(stackModule)
+	stackYaml, err := nix.EvaluateStack(stackModule)
 
 	if err != nil {
 		return err
 	}
 
+	stackYaml, _ = strconv.Unquote(stackYaml)
+
 	fmt.Printf("%s", stackYaml)
 	return nil
-}
-
-func eval(module string) (string, error) {
-	cmd := "nix-instantiate"
-
-	args := []string{
-		path.Join(getNixDir(), "lib/eval-stack.nix"),
-		"--eval",
-		"--read-write-mode",
-		"--show-trace",
-		"--json",
-		fmt.Sprintf("--arg modules \"[ \"%s\" ]\"", module),
-		"--attr config.stackYamlText",
-	}
-
-	task := execute.ExecTask{
-		Command: cmd,
-		Args:    args,
-		Shell:   true,
-	}
-
-	res, err := task.Execute()
-
-	if err != nil {
-		return "", err
-	}
-
-	if res.ExitCode != 0 {
-		return "", fmt.Errorf("received not-zero exit code from evaluation, error: %s", res.Stderr)
-	}
-
-	stackYaml, _ := strconv.Unquote(res.Stdout)
-
-	return stackYaml, nil
 }

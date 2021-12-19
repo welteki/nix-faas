@@ -6,9 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Path to nix files
-var NixDir string
-
 var (
 	stackModule string
 )
@@ -33,12 +30,4 @@ Manage your OpenFaaS functions using nix`,
 
 func runRootCmd(cmd *cobra.Command, args []string) {
 	cmd.Help()
-}
-
-func getNixDir() string {
-	if len(NixDir) == 0 {
-		return os.Getenv("NIXFAAS_NIX_DIR")
-	}
-
-	return NixDir
 }
