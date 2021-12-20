@@ -3,8 +3,6 @@ package commands
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
-	"path"
 
 	"gopkg.in/yaml.v2"
 
@@ -16,9 +14,6 @@ import (
 )
 
 func init() {
-	build, _, _ := rootCmd.Find([]string{"build"})
-	publishCmd.Flags().AddFlagSet(build.Flags())
-
 	rootCmd.AddCommand(publishCmd)
 }
 
@@ -37,22 +32,25 @@ func preRunPublish(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runPublish(cmd *cobra.Command, args []string) error {
-	var out string
-	if len(outLink) == 0 {
-		// TODO: outlink should contain random part
-		out = path.Join(os.TempDir(), ".tmp-stack.yaml")
-		defer os.Remove(outLink)
-	} else {
-		out = outLink
+func runPublish(cmd *cobra.Command, args []string) (retErr error) {
+	gcRoot, err := nix.NewGarbageCollectionRoot()
+	if err != nil {
+		return err
 	}
+	defer func() {
+		if err := gcRoot.Close(); err != nil {
+			retErr = fmt.Errorf("(gcroot: %v): %w", err, retErr)
+		}
+	}()
 
-	err := nix.BuildStack(stackModule, out)
+	err = nix.BuildStack(stackModule, gcRoot)
 	if err != nil {
 		return err
 	}
 
-	config, err := readNixFaasConfig(out)
+	stackYaml := gcRoot.Path()
+
+	config, err := readNixFaasConfig(stackYaml)
 
 	for _, image := range config.StackMetadata.Images {
 		err := push(image)

@@ -7,13 +7,7 @@ import (
 	"github.com/welteki/nix-faas/cli/nix"
 )
 
-var (
-	outLink string
-)
-
 func init() {
-	buildCmd.Flags().StringVarP(&outLink, "out-link", "o", "", "Create a symlink from the derivations output path to outlink")
-
 	rootCmd.AddCommand(buildCmd)
 }
 
@@ -32,8 +26,8 @@ func preRunBuild(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runBuild(cmd *cobra.Command, args []string) error {
-	err := nix.BuildStack(stackModule, outLink)
+func runBuild(cmd *cobra.Command, args []string) (retErr error) {
+	err := nix.BuildStack(stackModule, nil)
 
 	if err != nil {
 		return err
