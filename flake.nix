@@ -8,42 +8,70 @@
     flake-compat.flake = false;
   };
 
-  outputs = { self, nixpkgs, utils, ... }@inputs: {
-
-    overlay = final: prev: {
-      of-watchdog = import ./pkgs/of-watchdog.nix final;
-      classic-watchdog = import ./pkgs/classic-watchdog.nix final;
-      ofTools = import ./pkgs/build-support/openfaas final;
-    };
-
-  } // utils.lib.eachSystem [ "x86_64-linux" ] (system:
+  outputs = { self, nixpkgs, utils, ... }@inputs:
     let
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ self.overlay ];
-      };
+      supportedSystems = [ "x86_64-linux" ];
     in
     {
-      packages = {
-        inherit (pkgs) of-watchdog classic-watchdog;
-        classic-watchdog-image = pkgs.ofTools.baseImages.classic-watchdog;
-        of-watchdog-image = pkgs.ofTools.baseImages.of-watchdog;
+
+      overlay = final: prev: {
+        of-watchdog = import ./pkgs/of-watchdog.nix final;
+        classic-watchdog = import ./pkgs/classic-watchdog.nix final;
+        ofTools = import ./pkgs/build-support/openfaas final;
+
+        nix-faas =
+          let
+            inherit (final) lib buildGoModule makeWrapper skopeo faas-cli;
+          in
+          buildGoModule {
+            pname = "nix-faas";
+            version = "0.0.1-dev";
+
+            src = ./.;
+            subPackages = [ "cli" ];
+
+            vendorSha256 = null;
+
+            buildInputs = [ makeWrapper ];
+
+            postInstall = ''
+              makeWrapper $out/bin/cli $out/bin/nix-faas \
+                --prefix PATH : ${lib.makeBinPath [ skopeo faas-cli ]}
+            '';
+          };
       };
 
-      devShell = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          go
-          gotools
-          gopls
-          go-outline
-          gocode
-          gopkgs
-          gocode-gomod
-          godef
-          golint
-          delve
-          nixpkgs-fmt
-        ];
-      };
-    });
+    } // utils.lib.eachSystem supportedSystems (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ self.overlay ];
+        };
+      in
+      {
+        packages = {
+          inherit (pkgs) nix-faas of-watchdog classic-watchdog;
+          classic-watchdog-image = pkgs.ofTools.baseImages.classic-watchdog;
+          of-watchdog-image = pkgs.ofTools.baseImages.of-watchdog;
+        };
+
+        defaultPackage = pkgs.nix-faas;
+
+        devShell = pkgs.mkShell {
+          buildInputs = builtins.attrValues {
+            inherit (pkgs)
+              go
+              gotools
+              gopls
+              go-outline
+              gocode
+              gopkgs
+              gocode-gomod
+              godef
+              golint
+              delve
+              nixpkgs-fmt;
+          };
+        };
+      });
 }
