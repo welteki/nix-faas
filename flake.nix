@@ -40,9 +40,18 @@
 
             buildInputs = [ makeWrapper ];
 
+            ldflags = [
+              "-s"
+              "-w"
+              "-X github.com/welteki/nix-faas/cli/nix.NixDir=${placeholder "out"}/nix"
+            ];
+
             postInstall = ''
               makeWrapper $out/bin/cli $out/bin/nix-faas \
                 --prefix PATH : ${lib.makeBinPath [ skopeo faas-cli ]}
+
+              mkdir $out/nix
+              cp -R lib pkgs modules $out/nix
             '';
           };
       };
