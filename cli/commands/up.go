@@ -3,9 +3,10 @@ package commands
 import (
 	"fmt"
 
-	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/spf13/cobra"
+	"github.com/welteki/nix-faas/cli/faas"
 	"github.com/welteki/nix-faas/cli/nix"
+	"github.com/welteki/nix-faas/cli/stack"
 )
 
 func init() {
@@ -45,7 +46,10 @@ func runUp(cmd *cobra.Command, args []string) (retErr error) {
 
 	stackYaml := gcRoot.Path()
 
-	config, err := readNixFaasConfig(stackYaml)
+	config, err := stack.ReadNixFaasConfig(stackYaml)
+	if err != nil {
+		return fmt.Errorf("getting nix-faas config: %w", err)
+	}
 
 	for _, image := range config.StackMetadata.Images {
 		err := push(image)
@@ -54,37 +58,9 @@ func runUp(cmd *cobra.Command, args []string) (retErr error) {
 		}
 	}
 
-	err = deploy(stackYaml)
+	err = faas.Deploy(stackYaml)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func deploy(yamlFile string) error {
-	cmd := "faas-cli"
-
-	args := []string{
-		"deploy",
-		"-f",
-		yamlFile,
-	}
-
-	task := execute.ExecTask{
-		Command:     cmd,
-		Args:        args,
-		StreamStdio: true,
-	}
-
-	res, err := task.Execute()
-
-	if err != nil {
-		return err
-	}
-
-	if res.ExitCode != 0 {
-		return fmt.Errorf("%q terminated with non-zero exit code", cmd)
+		return fmt.Errorf("deploying functions: %w", err)
 	}
 
 	return nil

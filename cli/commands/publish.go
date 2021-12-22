@@ -2,11 +2,7 @@ package commands
 
 import (
 	"fmt"
-	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
-
-	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/spf13/cobra"
 	"github.com/welteki/nix-faas/cli/image"
 	"github.com/welteki/nix-faas/cli/nix"
@@ -50,7 +46,10 @@ func runPublish(cmd *cobra.Command, args []string) (retErr error) {
 
 	stackYaml := gcRoot.Path()
 
-	config, err := readNixFaasConfig(stackYaml)
+	config, err := stack.ReadNixFaasConfig(stackYaml)
+	if err != nil {
+		return fmt.Errorf("getting nix-faas config: %w", err)
+	}
 
 	for _, image := range config.StackMetadata.Images {
 		err := push(image)
@@ -59,58 +58,24 @@ func runPublish(cmd *cobra.Command, args []string) (retErr error) {
 		}
 	}
 
-	return err
+	return nil
 }
 
 func push(m stack.ImageMetadata) (retErr error) {
-	a, err := image.NewArchiveFromStream(m.Source)
+	dockerArchive, err := image.NewArchiveFromStream(m.Source)
 	if err != nil {
 		return fmt.Errorf("creating image archive: %w", err)
 	}
 	defer func() {
-		if err := a.Close(); err != nil {
+		if err := dockerArchive.Close(); err != nil {
 			retErr = fmt.Errorf("(archive: %v): %w", err, retErr)
 		}
 	}()
 
-	cmd := "skopeo"
-
-	args := []string{
-		"copy",
-		fmt.Sprintf("docker-archive:%s", a.Path()),
-		fmt.Sprintf("docker://%s", m.Specifier),
-		"--insecure-policy",
-	}
-
-	task := execute.ExecTask{
-		Command:     cmd,
-		Args:        args,
-		StreamStdio: true,
-	}
-
-	res, err := task.Execute()
-
+	err = image.Copy(dockerArchive.Path(), m.Specifier)
 	if err != nil {
-		return err
-	}
-
-	if res.ExitCode != 0 {
-		return fmt.Errorf("received not-zero exit code from evaluation, error: %s", res.Stderr)
+		return fmt.Errorf("copying image: %w", err)
 	}
 
 	return nil
-}
-
-func readNixFaasConfig(path string) (stack.NixFaas, error) {
-	config := stack.NixFaas{}
-
-	configBytes, err := ioutil.ReadFile(path)
-	if err != nil {
-		return config, fmt.Errorf("reading file %q: %w", path, err)
-	}
-	unmarshallErr := yaml.Unmarshal(configBytes, &config)
-	if unmarshallErr != nil {
-		return config, fmt.Errorf("reading configuration: %w", err)
-	}
-	return config, nil
 }
