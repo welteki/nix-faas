@@ -1,5 +1,5 @@
 {
-  description = "Flake with some boilerplate";
+  description = "Build and deploy serverless functions with Nix";
 
   inputs = {
     nixpkgs.follows = "nix/nixpkgs";
