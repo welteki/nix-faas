@@ -11,7 +11,7 @@
   outputs = { nix, self, nixpkgs, utils, ... }@inputs: {
 
     overlay = final: prev: {
-      of-watchdog = import .packages/of-watchdog.nix final;
+      of-watchdog = import ./packages/of-watchdog.nix final;
       classic-watchdog = import ./packages/classic-watchdog.nix final;
     };
 
