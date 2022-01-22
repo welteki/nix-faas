@@ -2,13 +2,13 @@
   description = "Build and deploy serverless functions with Nix";
 
   inputs = {
-    nixpkgs.follows = "nix/nixpkgs";
+    nixpkgs.url = "nixpkgs/nixos-21.11-small";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
   };
 
-  outputs = { nix, self, nixpkgs, utils, ... }@inputs: {
+  outputs = { self, nixpkgs, utils, ... }@inputs: {
 
     overlay = final: prev: {
       of-watchdog = import ./pkgs/of-watchdog.nix final;
