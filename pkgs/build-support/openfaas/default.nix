@@ -1,10 +1,12 @@
-{ lib, classic-watchdog, of-watchdog, dockerTools, ... }:
+{ pkgs, lib, classic-watchdog, of-watchdog, dockerTools, ... }:
 
 with builtins;
 
 let
   baseImages =
     let
+      bash = pkgs.pkgsStatic.bash;
+
       extraCommands = ''
         mkdir -p tmp
         mkdir -p var/openfaas/secrets
@@ -17,7 +19,7 @@ let
         name = classic-watchdog.pname;
         tag = classic-watchdog.version;
 
-        contents = [ classic-watchdog ];
+        contents = [ classic-watchdog bash ];
       };
 
       of-watchdog = dockerTools.buildImage {
@@ -26,7 +28,7 @@ let
         name = of-watchdog.pname;
         tag = of-watchdog.version;
 
-        contents = [ of-watchdog ];
+        contents = [ of-watchdog bash ];
       };
     };
 
@@ -69,6 +71,8 @@ let
           Healthcheck = {
             Test = [
               "CMD"
+              "/bin/sh"
+              "-c"
               "[ -e /tmp/.lock ] || exit 0"
             ];
             Interval = 3000000000;
