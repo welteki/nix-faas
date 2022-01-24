@@ -1,0 +1,22 @@
+name: "Build"
+on:
+  pull_request:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - uses: cachix/install-nix-action@v16
+      - uses: cachix/cachix-action@v10
+        with:
+          name: welteki
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Build 🔧
+        run: |
+          # Build watchdogs
+          nix build .#classic-watchdog
+          nix build .#of-watchdog
+          # Build base-images
+          nix build .#classic-watchdog-image
+          nix build .#of-watchdog-image
