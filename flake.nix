@@ -15,7 +15,18 @@
 
   outputs = { self, nixpkgs, utils, ... }@inputs:
     let
+      version = versionNumber + "-" + versionSuffix;
+      versionSuffix =
+        if officialRelease
+        then ""
+        else "pre${builtins.substring 0 8 (self.lastModifiedDate)}-${self.shortRev or "dirty"}";
+      commit = "${self.rev or "dirty"}";
+
+      versionNumber = "0.1.0";
+      officialRelease = false;
+
       supportedSystems = [ "x86_64-linux" ];
+
       overlays = [
         (final: prev: {
           nix-faas =
@@ -23,8 +34,8 @@
               inherit (final) lib buildGoModule makeWrapper skopeo faas-cli;
             in
             buildGoModule {
+              inherit version;
               pname = "nix-faas";
-              version = "0.0.1-dev";
 
               src = ./.;
               subPackages = [ "cli" ];
@@ -37,6 +48,8 @@
                 "-s"
                 "-w"
                 "-X github.com/welteki/nix-faas/cli/nix.NixDir=${placeholder "out"}/nix"
+                "-X github.com/welteki/nix-faas/cli/commands.Version=${version}"
+                "-X github.com/welteki/nix-faas/cli/commands.GitCommit=${commit}"
               ];
 
               postInstall = ''
