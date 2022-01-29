@@ -3,34 +3,10 @@
 let
   inherit (lib) mkOption types;
   inherit (types) listOf nullOr attrsOf str either int bool enum package;
-  inherit (pkgs) writeShellScriptBin dockerTools callPackage;
 
-  classic-watchdog = callPackage ../pkgs/classic-watchdog.nix { };
-  of-watchdog = callPackage ../pkgs/of-watchdog.nix { };
-
-  defaultTo = default: v: if v == null then default else v;
-
-  fwatchdog =
-    if config.watchdog == "classic"
-    then "${classic-watchdog}/bin/classic-watchdog"
-    else "${of-watchdog}/bin/of-watchdog";
-
-  function = writeShellScriptBin "${config.name}" ''
-    export fprocess="${builtins.concatStringsSep " " config.fprocess}"
-    export mode="${defaultTo "streaming" config.watchdogMode}"
-
-    ${fwatchdog}
-  '';
-
-  functionImage = dockerTools.streamLayeredImage {
+  functionImage = pkgs.ofTools.streamOfImage {
     inherit (config.image) name tag;
-
-    extraCommands = ''
-      mkdir -p tmp
-      mkdir -p var/openfaas/secrets
-    '';
-
-    config.Cmd = [ "${function}/bin/${function.name}" ];
+    inherit (config) watchdog watchdogMode fprocess;
   };
 
   limitOptions = {
@@ -72,13 +48,13 @@ in
     };
 
     fprocess = mkOption {
-      type = listOf str;
-      default = [ ];
+      type = nullOr str;
+      default = null;
     };
 
     watchdog = mkOption {
-      type = enum [ "classic" "of" ];
-      default = "classic";
+      type = enum [ "classic-watchdog" "of-watchdog" ];
+      default = "classic-watchdog";
     };
 
     watchdogMode = mkOption {
