@@ -11,50 +11,50 @@
   outputs = { self, nixpkgs, utils, ... }@inputs:
     let
       supportedSystems = [ "x86_64-linux" ];
+      overlays = [
+        (final: prev: {
+          nix-faas =
+            let
+              inherit (final) lib buildGoModule makeWrapper skopeo faas-cli;
+            in
+            buildGoModule {
+              pname = "nix-faas";
+              version = "0.0.1-dev";
+
+              src = ./.;
+              subPackages = [ "cli" ];
+
+              vendorSha256 = null;
+
+              buildInputs = [ makeWrapper ];
+
+              ldflags = [
+                "-s"
+                "-w"
+                "-X github.com/welteki/nix-faas/cli/nix.NixDir=${placeholder "out"}/nix"
+              ];
+
+              postInstall = ''
+                makeWrapper $out/bin/cli $out/bin/nix-faas \
+                  --prefix PATH : ${lib.makeBinPath [ skopeo faas-cli ]}
+
+                mkdir $out/nix
+                cp -R lib pkgs modules $out/nix
+                cp ./overlay.nix $out/nix/overlay.nix
+              '';
+            };
+        })
+        localPkgsOverlay
+      ];
+      localPkgsOverlay = import ./overlay.nix;
     in
     {
-
-      overlay = final: prev: {
-        of-watchdog = import ./pkgs/of-watchdog.nix final;
-        classic-watchdog = import ./pkgs/classic-watchdog.nix final;
-        ofTools = import ./pkgs/build-support/openfaas final;
-
-        nix-faas =
-          let
-            inherit (final) lib buildGoModule makeWrapper skopeo faas-cli;
-          in
-          buildGoModule {
-            pname = "nix-faas";
-            version = "0.0.1-dev";
-
-            src = ./.;
-            subPackages = [ "cli" ];
-
-            vendorSha256 = null;
-
-            buildInputs = [ makeWrapper ];
-
-            ldflags = [
-              "-s"
-              "-w"
-              "-X github.com/welteki/nix-faas/cli/nix.NixDir=${placeholder "out"}/nix"
-            ];
-
-            postInstall = ''
-              makeWrapper $out/bin/cli $out/bin/nix-faas \
-                --prefix PATH : ${lib.makeBinPath [ skopeo faas-cli ]}
-
-              mkdir $out/nix
-              cp -R lib pkgs modules $out/nix
-            '';
-          };
-      };
+      overlay = localPkgsOverlay;
 
     } // utils.lib.eachSystem supportedSystems (system:
       let
         pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ self.overlay ];
+          inherit system overlays;
         };
       in
       {
