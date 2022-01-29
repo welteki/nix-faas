@@ -5,7 +5,7 @@ let
   inherit (types) listOf nullOr attrsOf str either int bool enum package;
 
   functionImage = pkgs.ofTools.streamOfImage {
-    inherit (config.image) name tag;
+    inherit (config.image) name tag created;
     inherit (config) watchdog watchdogMode fprocess;
   };
 
@@ -68,6 +68,11 @@ in
     };
 
     image.tag = mkOption {
+      type = nullOr str;
+      default = null;
+    };
+
+    image.created = mkOption {
       type = nullOr str;
       default = null;
     };
