@@ -57,17 +57,9 @@ func Test_getEvalStackFile(t *testing.T) {
 	}
 }
 
-func Test_formatModuleExpr_Rel(t *testing.T) {
-	want := "\"[ (./. + \"/stack.nix\") ]\""
-	got := formatModulesExpr("stack.nix")
-	if want != got {
-		t.Fatalf("formatModuleExpr want: \"%s\", got: \"%s\"", want, got)
-	}
-}
-
-func Test_formatModulesExpr_Abs(t *testing.T) {
-	want := "\"[ (/. + \"/foo/stack.nix\") ]\""
-	got := formatModulesExpr("/foo/stack.nix")
+func Test_formatModuleExpr(t *testing.T) {
+	want := "\"[ (./. + \"/stack.nix\") (/. + \"/foo/stack.nix\") ]\""
+	got := formatModulesExpr([]string{"stack.nix", "/foo/stack.nix"})
 	if want != got {
 		t.Fatalf("formatModuleExpr want: \"%s\", got: \"%s\"", want, got)
 	}
