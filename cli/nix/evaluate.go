@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
 )
@@ -13,8 +14,8 @@ const NixDirEnv string = "NIXFAAS_NIX_DIR"
 // Path to nix files
 var NixDir string
 
-func EvaluateStack(module string) (string, error) {
-	cmd, args := getEvaluateCommand(getEvalStackFile(), formatModulesExpr(module))
+func EvaluateStack(modules []string) (string, error) {
+	cmd, args := getEvaluateCommand(getEvalStackFile(), formatModulesExpr(modules))
 
 	task := execute.ExecTask{
 		Command: cmd,
@@ -65,10 +66,16 @@ func getEvalStackFile() string {
 	return path.Join(getNixDir(), "lib/eval-stack.nix")
 }
 
-func formatModulesExpr(module string) string {
-	if path.IsAbs(module) {
-		return fmt.Sprintf("\"[ (/. + \"%s\") ]\"", module)
-	} else {
-		return fmt.Sprintf("\"[ (./. + \"/%s\") ]\"", module)
+func formatModulesExpr(modules []string) string {
+	var modulePaths []string
+
+	for _, module := range modules {
+		if path.IsAbs(module) {
+			modulePaths = append(modulePaths, fmt.Sprintf("(/. + \"%s\")", module))
+		} else {
+			modulePaths = append(modulePaths, fmt.Sprintf("(./. + \"/%s\")", module))
+		}
 	}
+
+	return fmt.Sprintf("\"[ %s ]\"", strings.Join(modulePaths, " "))
 }

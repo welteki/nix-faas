@@ -19,15 +19,15 @@ var buildCmd = &cobra.Command{
 }
 
 func preRunBuild(cmd *cobra.Command, args []string) error {
-	if len(stackModule) == 0 {
-		return fmt.Errorf("--file or -f is required")
+	if len(stackModules) == 0 {
+		return fmt.Errorf("use --file or -f to specify modules")
 	}
 
 	return nil
 }
 
 func runBuild(cmd *cobra.Command, args []string) (retErr error) {
-	err := nix.BuildStack(stackModule, nil)
+	err := nix.BuildStack(stackModules, nil)
 
 	if err != nil {
 		return err

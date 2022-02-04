@@ -20,15 +20,15 @@ var evalCmd = &cobra.Command{
 }
 
 func preRunEval(cmd *cobra.Command, args []string) error {
-	if len(stackModule) == 0 {
-		return fmt.Errorf("--file or -f is required")
+	if len(stackModules) == 0 {
+		return fmt.Errorf("use --file or -f to specify modules")
 	}
 
 	return nil
 }
 
 func runEval(cmd *cobra.Command, args []string) error {
-	stackYaml, err := nix.EvaluateStack(stackModule)
+	stackYaml, err := nix.EvaluateStack(stackModules)
 
 	if err != nil {
 		return err

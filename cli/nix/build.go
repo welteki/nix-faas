@@ -6,14 +6,14 @@ import (
 	execute "github.com/alexellis/go-execute/pkg/v1"
 )
 
-func BuildStack(module string, gcRoot *GarbageCollectionRoot) error {
+func BuildStack(modules []string, gcRoot *GarbageCollectionRoot) error {
 	var outLink string
 
 	if gcRoot != nil {
 		outLink = gcRoot.Path()
 	}
 
-	cmd, args := getBuildCommand(getEvalStackFile(), formatModulesExpr(module), outLink)
+	cmd, args := getBuildCommand(getEvalStackFile(), formatModulesExpr(modules), outLink)
 
 	task := execute.ExecTask{
 		Command:     cmd,

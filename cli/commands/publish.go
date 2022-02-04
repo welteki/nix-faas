@@ -21,8 +21,8 @@ var publishCmd = &cobra.Command{
 }
 
 func preRunPublish(cmd *cobra.Command, args []string) error {
-	if len(stackModule) == 0 {
-		return fmt.Errorf("--file or -f is required")
+	if len(stackModules) == 0 {
+		return fmt.Errorf("use --file or -f to specify modules")
 	}
 
 	return nil
@@ -39,7 +39,7 @@ func runPublish(cmd *cobra.Command, args []string) (retErr error) {
 		}
 	}()
 
-	err = nix.BuildStack(stackModule, gcRoot)
+	err = nix.BuildStack(stackModules, gcRoot)
 	if err != nil {
 		return err
 	}

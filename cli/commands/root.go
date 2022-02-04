@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	stackModule string
+	stackModules []string
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&stackModule, "file", "f", "", "Path to nix module file describing function(s)")
+	rootCmd.PersistentFlags().StringSliceVarP(&stackModules, "file", "f", []string{}, "Path to nix module file describing function(s)")
 }
 
 func Execute() {
