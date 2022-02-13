@@ -26,7 +26,7 @@
         (final: prev: {
           nix-faas =
             let
-              inherit (final) lib buildGoModule makeWrapper skopeo faas-cli;
+              inherit (final) lib buildGoModule makeWrapper skopeo faas-cli bash;
             in
             buildGoModule {
               inherit version;
@@ -38,6 +38,12 @@
               vendorSha256 = null;
 
               buildInputs = [ makeWrapper ];
+
+              # Patch go-execute.
+              postConfigure = ''
+                substituteInPlace vendor/github.com/alexellis/go-execute/pkg/v1/exec.go \
+                  --replace "/bin/bash" "${bash}/bin/bash"
+              '';
 
               ldflags = [
                 "-s"
