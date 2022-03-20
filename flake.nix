@@ -18,6 +18,8 @@
 
   } // utils.lib.eachSystem [ "x86_64-linux" ] (system:
     let
+      inherit (pkgs) lib;
+
       pkgs = import nixpkgs {
         inherit system;
         overlays = [ self.overlay ];
@@ -29,6 +31,32 @@
         classic-watchdog-image = pkgs.ofTools.baseImages.classic-watchdog;
         of-watchdog-image = pkgs.ofTools.baseImages.of-watchdog;
       };
+
+      bundlers =
+        let
+          imageArgs = drv: {
+            name = drv.pname or drv.name;
+            tag = "latest";
+
+            contents = [
+              pkgs.findutils
+              drv
+            ];
+
+            fprocess = "/bin/xargs /bin/${drv.meta.mainProgram or drv.pname or drv.name}";
+          };
+        in
+        rec {
+          toWatchdogImage = drv:
+            pkgs.ofTools.buildOfImage (imageArgs drv);
+
+          toOfWatchdogImage = drv:
+            pkgs.ofTools.buildOfImage ((imageArgs drv) // {
+              watchdog = "of-watchdog";
+            });
+
+          default = toWatchdogImage;
+        };
 
       devShell = pkgs.mkShell {
         buildInputs = [ pkgs.nixpkgs-fmt ];
