@@ -17,7 +17,7 @@ jobs:
         run: |
           nix build -L .#classic-watchdog
           nix eval --json .#classic-watchdog | jq -r | cachix push welteki
-      - name: Build classic-watchdog 🔧
+      - name: Build of-watchdog 🔧
         run: |
           nix build -L .#of-watchdog
           nix eval --json .#of-watchdog | jq -r | cachix push welteki
