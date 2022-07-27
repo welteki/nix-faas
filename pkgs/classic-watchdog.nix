@@ -2,14 +2,14 @@
 
 buildGoModule rec {
   pname = "classic-watchdog";
-  version = "0.2.0";
-  rev = "56bf6aac54deb3863a690f5fc03a2a38e7d9e6ef";
+  version = "0.2.1";
+  rev = "cd8dc9f4e98049150d8079a74a18cd5a2e311aeb";
 
   src = fetchFromGitHub {
     owner = "openfaas";
     repo = "classic-watchdog";
     rev = version;
-    sha256 = "146xp61wd6i1jhifnndsihqx29dwc9snixlniyxp79wcsypg4n5x";
+    sha256 = "sha256-HMF/1Ky/2WrhogvymqxjbVfsfXH/NZQkRYZPTB6cuD4=";
   };
 
   vendorSha256 = null;
