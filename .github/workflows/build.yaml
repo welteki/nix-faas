@@ -12,11 +12,16 @@ jobs:
         with:
           name: welteki
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Build 🔧
+          skipPush: true
+      - name: Build classic-watchdog 🔧
         run: |
-          # Build watchdogs
-          nix build .#classic-watchdog
-          nix build .#of-watchdog
-          # Build base-images
+          nix build -L .#classic-watchdog
+          nix eval --json .#classic-watchdog | jq -r | cachix push welteki
+      - name: Build classic-watchdog 🔧
+        run: |
+          nix build -L .#of-watchdog
+          nix eval --json .#of-watchdog | jq -r | cachix push welteki
+      - name: Build base images 🔧
+        run: |
           nix build .#classic-watchdog-image
           nix build .#of-watchdog-image
