@@ -2,7 +2,7 @@
   description = "Build and deploy serverless functions with Nix";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-21.11-small";
+    nixpkgs.url = "nixpkgs/nixos-22.05-small";
     utils.url = "github:numtide/flake-utils";
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
