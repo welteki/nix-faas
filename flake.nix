@@ -10,7 +10,7 @@
 
   outputs = { self, nixpkgs, utils, ... }@inputs: {
 
-    overlay = final: prev: {
+    overlays.default = final: prev: {
       of-watchdog = import ./pkgs/of-watchdog.nix final;
       classic-watchdog = import ./pkgs/classic-watchdog.nix final;
       ofTools = import ./pkgs/build-support/openfaas final;
@@ -20,7 +20,7 @@
     let
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ self.overlay ];
+        overlays = [ self.overlays.default ];
       };
     in
     {
@@ -30,7 +30,7 @@
         of-watchdog-image = pkgs.ofTools.baseImages.of-watchdog;
       };
 
-      devShell = pkgs.mkShell {
+      devShells.default = pkgs.mkShell {
         buildInputs = [ pkgs.nixpkgs-fmt ];
       };
     });
