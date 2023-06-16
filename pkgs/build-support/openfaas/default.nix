@@ -19,7 +19,11 @@ let
         name = classic-watchdog.pname;
         tag = classic-watchdog.version;
 
-        contents = [ classic-watchdog bash ];
+        copyToRoot = pkgs.buildEnv {
+          name = "image-root";
+          paths = [ classic-watchdog bash ];
+          pathsToLink = [ "/bin" ];
+        };
       };
 
       of-watchdog = dockerTools.buildImage {
@@ -28,7 +32,11 @@ let
         name = of-watchdog.pname;
         tag = of-watchdog.version;
 
-        contents = [ of-watchdog bash ];
+        copyToRoot = pkgs.buildEnv {
+          name = "image-root";
+          paths = [ of-watchdog bash ];
+          pathsToLink = [ "/bin" ];
+        };
       };
     };
 
