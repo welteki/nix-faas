@@ -14,6 +14,8 @@
       of-watchdog = import ./pkgs/of-watchdog.nix final;
       classic-watchdog = import ./pkgs/classic-watchdog.nix final;
       ofTools = import ./pkgs/build-support/openfaas final;
+
+      hello-fn = import ./examples/hello-fn.nix final;
     };
 
   } // utils.lib.eachSystem [ "x86_64-linux" ] (system:
@@ -25,7 +27,7 @@
     in
     {
       packages = {
-        inherit (pkgs) of-watchdog classic-watchdog;
+        inherit (pkgs) of-watchdog classic-watchdog hello-fn;
         classic-watchdog-image = pkgs.ofTools.baseImages.classic-watchdog;
         of-watchdog-image = pkgs.ofTools.baseImages.of-watchdog;
       };
