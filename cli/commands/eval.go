@@ -34,6 +34,7 @@ func runEval(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	stackYaml, _ = strconv.QuotedPrefix(stackYaml)
 	stackYaml, _ = strconv.Unquote(stackYaml)
 
 	fmt.Printf("%s", stackYaml)
