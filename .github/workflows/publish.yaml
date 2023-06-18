@@ -25,6 +25,10 @@ jobs:
         run: |
           nix build -L .#of-watchdog --accept-flake-config
           nix eval --json .#of-watchdog | jq -r | cachix push welteki
+      - name: Build nix-faas CLI 🔧
+        run: |
+          nix build -L .#nix-faas --accept-flake-config
+          nix eval --json .#nix-faas | jq -r | cachix push welteki
       - name: Build base images 🔧
         run: |
           nix build .#classic-watchdog-image --accept-flake-config
