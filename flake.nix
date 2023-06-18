@@ -50,6 +50,10 @@
                   --replace "/bin/bash" "${bash}/bin/bash"
               '';
 
+              patches = [
+                patches/go-exec-log-stderr.patch
+              ];
+
               ldflags = [
                 "-s"
                 "-w"

@@ -16,10 +16,11 @@ func BuildStack(modules []string, gcRoot *GarbageCollectionRoot) error {
 	cmd, args := getBuildCommand(getEvalStackFile(), formatModulesExpr(modules), outLink)
 
 	task := execute.ExecTask{
-		Command:     cmd,
-		Args:        args,
-		Shell:       true,
-		StreamStdio: true,
+		Command:      cmd,
+		Args:         args,
+		Shell:        true,
+		StreamStdio:  true,
+		PrintCommand: nixDebug,
 	}
 
 	res, err := task.Execute()

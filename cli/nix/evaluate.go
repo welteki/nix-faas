@@ -18,9 +18,10 @@ func EvaluateStack(modules []string) (string, error) {
 	cmd, args := getEvaluateCommand(getEvalStackFile(), formatModulesExpr(modules))
 
 	task := execute.ExecTask{
-		Command: cmd,
-		Args:    args,
-		Shell:   true,
+		Command:      cmd,
+		Args:         args,
+		Shell:        true,
+		PrintCommand: nixDebug,
 	}
 
 	res, err := task.Execute()
