@@ -6,7 +6,6 @@ let
   inherit (pkgs) lib buildGoModule;
 
   serviceStack = lib.evalModules {
-    check = true;
     modules = baseModules ++ modules;
   };
 
@@ -20,6 +19,7 @@ let
     key = _file;
 
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
+    config._module.check = true;
   };
 in
 serviceStack
