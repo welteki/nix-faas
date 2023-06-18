@@ -3,7 +3,12 @@ package commands
 import (
 	"fmt"
 
+	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/google/go-containerregistry/pkg/v1/tarball"
 	"github.com/spf13/cobra"
+
 	"github.com/welteki/nix-faas/cli/image"
 	"github.com/welteki/nix-faas/cli/nix"
 	"github.com/welteki/nix-faas/cli/stack"
@@ -15,7 +20,7 @@ func init() {
 
 var publishCmd = &cobra.Command{
 	Use:     "publish -f MODULE_FILE",
-	Short:   "Builds and pushes OpenFaas function images to remote registry.",
+	Short:   "Builds and pushes OpenFaaS function images to remote registry.",
 	PreRunE: preRunPublish,
 	RunE:    runPublish,
 }
@@ -72,9 +77,21 @@ func push(m stack.ImageMetadata) (retErr error) {
 		}
 	}()
 
-	err = image.Copy(dockerArchive.Path(), m.Specifier)
+	ref, err := name.ParseReference(m.Specifier)
 	if err != nil {
-		return fmt.Errorf("copying image: %w", err)
+		return err
+	}
+
+	img, err := tarball.ImageFromPath(dockerArchive.Path(), nil)
+	if err != nil {
+		return err
+	}
+
+	options := []remote.Option{
+		remote.WithAuthFromKeychain(authn.DefaultKeychain),
+	}
+	if err := remote.Write(ref, img, options...); err != nil {
+		return err
 	}
 
 	return nil

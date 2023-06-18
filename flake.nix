@@ -31,7 +31,7 @@
         (final: prev: {
           nix-faas =
             let
-              inherit (final) lib buildGoModule makeWrapper skopeo faas-cli bash;
+              inherit (final) lib buildGoModule makeWrapper faas-cli bash;
             in
             buildGoModule {
               inherit version;
@@ -64,7 +64,7 @@
 
               postInstall = ''
                 makeWrapper $out/bin/cli $out/bin/nix-faas \
-                  --prefix PATH : ${lib.makeBinPath [ skopeo faas-cli ]}
+                  --prefix PATH : ${lib.makeBinPath [ faas-cli ]}
 
                 mkdir $out/nix
                 cp -R lib pkgs modules $out/nix
