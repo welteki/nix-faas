@@ -58,7 +58,7 @@ let
         fwatchdog = baseImages.${watchdog};
 
         buildImage = if stream then dockerTools.streamLayeredImage else dockerTools.buildLayeredImage;
-        acceptedArgs = functionArgs dockerTools.streamLayeredImage;
+        acceptedArgs = lib.functionArgs dockerTools.streamLayeredImage;
         args' = intersectAttrs acceptedArgs args;
       in
       buildImage (args' // {
