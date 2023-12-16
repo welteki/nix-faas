@@ -21,11 +21,11 @@ jobs:
         run: nix flake check -L --accept-flake-config
       - name: Build classic-watchdog 🔧
         run: |
-          nix build -L .#classic-watchdog
+          nix build -L .#classic-watchdog --accept-flake-config
       - name: Build of-watchdog 🔧
         run: |
-          nix build -L .#of-watchdog
+          nix build -L .#of-watchdog --accept-flake-config
       - name: Build base images 🔧
         run: |
-          nix build .#classic-watchdog-image
+          nix build .#classic-watchdog-image --accept-flake-config
           nix build .#of-watchdog-image

@@ -8,6 +8,11 @@
     flake-compat.flake = false;
   };
 
+  nixConfig = {
+    extra-substituters = [ "https://welteki.cachix.org" ];
+    extra-trusted-public-keys = [ "welteki.cachix.org-1:zb0txiNEbjq9Fx7svp4LhTgFIQHKSa5ESi7QlLFjjQY=" ];
+  };
+
   outputs = { self, nixpkgs, utils, ... }@inputs: {
 
     overlays.default = final: prev: {
