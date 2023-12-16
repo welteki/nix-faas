@@ -1,10 +1,8 @@
-name: 'Build packages'
+name: 'Build and push to cachix'
 on:
-  pull_request:
   push:
     branches:
-      - '**'
-      - '!main'
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,9 +20,11 @@ jobs:
       - name: Build classic-watchdog 🔧
         run: |
           nix build -L .#classic-watchdog
+          nix eval --json .#classic-watchdog | jq -r | cachix push welteki
       - name: Build of-watchdog 🔧
         run: |
           nix build -L .#of-watchdog
+          nix eval --json .#of-watchdog | jq -r | cachix push welteki
       - name: Build base images 🔧
         run: |
           nix build .#classic-watchdog-image
