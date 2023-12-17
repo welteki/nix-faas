@@ -38,7 +38,13 @@
       };
 
       devShells.default = pkgs.mkShell {
-        buildInputs = [ pkgs.nixpkgs-fmt ];
+        buildInputs = [
+          pkgs.cachix
+          pkgs.statix
+          pkgs.vulnix
+          pkgs.deadnix
+          pkgs.nil
+        ];
       };
     });
 }
