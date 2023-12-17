@@ -3,20 +3,19 @@
 }:
 
 let
-  inherit (pkgs) lib buildGoModule;
+  inherit (pkgs) lib;
 
   serviceStack = lib.evalModules {
     modules = baseModules ++ modules;
   };
 
-  baseModules = [ pkgsModule ] ++ [
-    ../modules/of-stack.nix
-    ../modules/images.nix
-  ];
+  baseModules = [
+    pkgsModule 
+  ] ++ import ./modules.nix;
 
-  pkgsModule = rec {
+  pkgsModule = {
     _file = ./eval-stack.nix;
-    key = _file;
+    key = ./eval-stack.nix;
 
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
     config._module.check = true;

@@ -2,7 +2,7 @@
 
 let
   inherit (lib) mkOption types;
-  inherit (types) listOf nullOr attrsOf str either int bool enum package;
+  inherit (types) listOf nullOr attrsOf str either int float oneOf bool enum package;
 
   ref = url: text:
     ''See: [${text}](${url})'';
@@ -193,7 +193,7 @@ in
 
         ${ofYamlRef "function-annotations"}
       '';
-      type = attrsOf str;
+      type = attrsOf (oneOf [str int float bool]) ;
       default = { };
       example = {
         "com.openfaas.health.http.path" = "/healtz";
