@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/welteki/nix-faas/cli/faas"
@@ -9,7 +10,22 @@ import (
 	"github.com/welteki/nix-faas/cli/stack"
 )
 
+const (
+	defaultGateway     = "http://127.0.0.1:8080"
+	faasTimeoutDefault = 60 * time.Second
+)
+
+var (
+	gateway     string
+	tlsInsecure bool
+	faasTimeout time.Duration
+)
+
 func init() {
+	upCmd.Flags().StringVarP(&gateway, "gateway", "g", defaultGateway, "Gateway URL starting with http(s)://")
+	upCmd.Flags().DurationVar(&faasTimeout, "timeout", faasTimeoutDefault, "Timeout for HTTP calls to the OpenFaaS API.")
+	upCmd.Flags().BoolVar(&tlsInsecure, "tls-no-verify", false, "Disable TLS validation for HTTP calls to the OpenFaaS API")
+
 	rootCmd.AddCommand(upCmd)
 }
 
@@ -58,7 +74,7 @@ func runUp(cmd *cobra.Command, args []string) (retErr error) {
 		}
 	}
 
-	err = faas.Deploy(stackYaml)
+	err = faas.Deploy(stackYaml, gateway, faasTimeout, tlsInsecure)
 	if err != nil {
 		return fmt.Errorf("deploying functions: %w", err)
 	}

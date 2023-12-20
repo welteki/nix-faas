@@ -20,7 +20,7 @@ func init() {
 
 var publishCmd = &cobra.Command{
 	Use:     "publish -f MODULE_FILE",
-	Short:   "Builds and pushes OpenFaaS function images to remote registry.",
+	Short:   "Builds and pushes OpenFaaS function images to a container registry",
 	PreRunE: preRunPublish,
 	RunE:    runPublish,
 }

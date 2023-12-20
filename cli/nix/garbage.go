@@ -34,7 +34,7 @@ func NewGarbageCollectionRoot() (*GarbageCollectionRoot, error) {
 
 // NewGarbageCollectionRootFromPath returns a GarbageCollectionRoot for the specified path.
 // The caller should call .Close() on the returned garbage collection root when done.
-// When preserve is true, resources assocated with the garbage collection root will be preserved even
+// When preserve is true, resources associated with the garbage collection root will be preserved even
 // when calling .Close()
 func NewGarbageCollectionRootFromPath(path string, preserve bool) (*GarbageCollectionRoot, error) {
 	_, err := os.Stat(path)

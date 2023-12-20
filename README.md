@@ -1,8 +1,8 @@
 > 🛠 **Status: Early experimental phase**
 >
-> This project is very much a work in progress. What you see here is only an early preview of the project.
+> This project is very much a work in progress.
 
-## Part one: nix openfaas tools
+## Part one: Nix OpenFaaS tools
 
 Build [OpenFaas](https://www.openfaas.com/) function images with Nix.
 
@@ -22,12 +22,44 @@ pkgs.ofTools.buildOfImage {
 }
 ```
 
-This example recreates the figlet image from the openfaas store but uses the `of-watchdog` instead of the `classic-watchdog` used in the original image.
+This example recreates the figlet image from the OpenFaaS store but uses the `of-watchdog` instead of the `classic-watchdog` used in the original image.
 
 ## Part two: CLI and NixOS modules
 
-> Not yet part of the repo but hope to publish it soon.
+`nix-faas` is a tool to build and deploy [OpenFaaS](https://www.openfaas.com/) functions using NixOS modules.
 
-Instead of configuring functions in YAML files `nix-faas` will use the Nix language to build and configure functions (similar to what [Arion](https://github.com/hercules-ci/arion) does for docker-compose).
+Instead of configuring functions in YAML files `nix-faas` will use the Nix language to build, configure and deploy OpenFaaS functions (similar to what [Arion](https://github.com/hercules-ci/arion) does for docker-compose).
 
-The `nix-faas` cli will be a wrapper around the [faas-cli](https://github.com/openfaas/faas-cli) making it possible to deploy Nix defined function to any system running [OpenFaaS](https://www.openfaas.com/).
+### Preview
+
+Deploy the `hello` and `figlet` package as a function to OpenFaaS.
+
+Example `stack.nix` file:
+
+```nix
+{pkgs, ...}: {
+  functions = {
+    hello = {
+        fprocess = "${pkgs.pkgsStatic.hello}/bin/hello";
+        image = {
+            name = "ttl.sh/nix-faas/hello";
+        };
+    };
+
+    figlet = {
+        fprocess = "${pkgs.pkgsStatic.figlet}/bin/figlet";
+        image = {
+            name = "ttl.sh/nix-faas/figlet";
+        };
+    };
+  };
+}
+```
+
+Deploy:
+
+```bash
+nix-faas up -f stack.nix
+```
+
+![](docs/preview.gif)

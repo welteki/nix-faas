@@ -2,12 +2,13 @@ package faas
 
 import (
 	"fmt"
+	"time"
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
 )
 
-func Deploy(yamlFile string) error {
-	cmd, args := getDeployCommand(yamlFile)
+func Deploy(yamlFile string, gateway string, timeout time.Duration, tlsInsecure bool) error {
+	cmd, args := getDeployCommand(yamlFile, gateway, timeout, tlsInsecure)
 
 	task := execute.ExecTask{
 		Command:     cmd,
@@ -28,11 +29,19 @@ func Deploy(yamlFile string) error {
 	return nil
 }
 
-func getDeployCommand(yamlFile string) (string, []string) {
+func getDeployCommand(yamlFile string, gateway string, timeout time.Duration, tlsInsecure bool) (string, []string) {
 	args := []string{
 		"deploy",
+		"--gateway",
+		gateway,
+		"--timeout",
+		timeout.String(),
 		"-f",
 		yamlFile,
+	}
+
+	if tlsInsecure {
+		args = append(args, "--tls-no-verify")
 	}
 
 	cmd := "faas-cli"
