@@ -1,10 +1,10 @@
-name: 'Build packages'
+name: "Build packages"
 on:
   pull_request:
   push:
     branches:
-      - '**'
-      - '!main'
+      - "**"
+      - "!main"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,4 +26,4 @@ jobs:
       - name: Build base images 🔧
         run: |
           nix build .#classic-watchdog-image --accept-flake-config
-          nix build .#of-watchdog-image
+          nix build .#of-watchdog-image --accept-flake-config
