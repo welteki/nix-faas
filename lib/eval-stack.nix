@@ -11,7 +11,7 @@ let
 
   baseModules = [
     pkgsModule 
-  ] ++ import ./modules.nix;
+  ] ++ import ../modules;
 
   pkgsModule = {
     _file = ./eval-stack.nix;
