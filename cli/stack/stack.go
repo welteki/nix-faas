@@ -2,7 +2,7 @@ package stack
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -27,7 +27,7 @@ type NixFaas struct {
 func ReadNixFaasConfig(yamlFile string) (NixFaas, error) {
 	config := NixFaas{}
 
-	configBytes, err := ioutil.ReadFile(yamlFile)
+	configBytes, err := os.ReadFile(yamlFile)
 	if err != nil {
 		return config, fmt.Errorf("reading file %q: %w", yamlFile, err)
 	}

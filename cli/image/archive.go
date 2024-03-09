@@ -3,7 +3,6 @@ package image
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 )
@@ -29,7 +28,7 @@ func NewArchiveFromFile(path string) (*Archive, error) {
 // NewArchiveFromStream returns an Archive for the specified (nix streamLayeredImage generated) image build script.
 // The caller should call .Close() on the returned archive when done.
 func NewArchiveFromStream(script string) (*Archive, error) {
-	tarArchive, err := ioutil.TempFile("", "nix-faas-docker-tar-*")
+	tarArchive, err := os.CreateTemp("", "nix-faas-docker-tar-*")
 	if err != nil {
 		return nil, fmt.Errorf("creating temporary file: %w", err)
 	}
