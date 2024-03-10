@@ -108,7 +108,7 @@
             delve
             
             # Nix
-            cachix
+            # cachix 
             statix
             vulnix
             deadnix
